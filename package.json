@@ -1,6 +1,6 @@
 {
   "name": "fos",
-  "version": "v0.0.2a",
+  "version": "v0.0.3a",
   "description": "Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.",
   "engines": {
     "node": "10.0.0"
