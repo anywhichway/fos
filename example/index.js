@@ -8,5 +8,9 @@ const FOS = require("../index.js"),
 			},
 			{allow:"*",name:"F"}
 	);
-server.use("/hello",(request,response) => { response.end("hi!"); });
+server.use((request,response,next) => { console.log(1,request.url); next(); },(request,response,next) => { console.log(2,request.url); next("route"); },(request,response,next) => { console.log(3,request.url); next(); });
+server.use(/\/hello/g,async (request,response,next) => { console.log(request.url); });
+server.param("id",async (request,response,next,value) => { console.log(request.url,value); });
+server.use("/hello/there/:id",(request,response,next) => { console.log(request.url,"to long"); next(); });
+server.use("/hello/:id",(request,response) => { response.end("hi!"); });
 server.listen(3000);

@@ -1,4 +1,4 @@
-# fos v0.0.2a
+# fos v0.0.3a
 
 Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.
 
@@ -14,7 +14,7 @@ Just create a new server by passing in an object with the functions you wish to 
 
 ```javascript
 const FOS = require("fos"),
-	fos = new FOS({echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*",name:"F"});
+  fos = new FOS({echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*",name:"F"});
 fos.listen(3000);
 ```
 
@@ -46,15 +46,15 @@ You can leave a script un-named and load it using fetch from the browser or anot
 
 ```javascript
 const FOS = require("fos"),
-	fos = new FOS({echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*"});
+  fos = new FOS({echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*"});
 fos.listen(3000);
 ```
 
 ```javascript
 var fos,
-	fetch;
+  fetch;
 if(typeof(window)==="undefined") {
-	fetch = require("fetch");
+  fetch = require("fetch");
 }
 fetch("http://localhost:3000/").then(response => response.text()).then(text => Function("fos = " + text)());
 ```
@@ -64,14 +64,12 @@ fetch("http://localhost:3000/").then(response => response.text()).then(text => F
 You can pass in nested objects when creating the server and access them via their dot notation, e.g. `F.Math.sqr(2)`:
 
 ```javascript
-new FOS(
-	{
-		echo:arg => arg,
-		Math: {
-			sqr: value => value * value
-		}
-	}
-)
+new FOS({
+  echo:arg => arg,
+  Math: {
+    sqr: value => value * value
+  }
+})
 ```
 
 ## method enhancements
@@ -125,19 +123,33 @@ F({credentials:true}).echo("a").then(result => alert(result));
 </html>
 ```
 
-## simulating Express
+## simulating Express ... plus some extras
 
-To simulate basic Express functionality, just add the static function `FOS.request` to your handler object and then add routes like you normally would:
+To simulate basic Express functionality, just add the static function `FOS.request` to your handler object and then add middleware like you normally would:
 
 ```
 const fos = new FOS({request:FOS.request});
 fos.use("/hello",(request,response) => response.end("hi!"));
 fos.listen(3000);
 ```
-
 You will then be able to load URLs directly in the browser from the FOS server, e.g. http://localhost:3000/hello, or request them using `request(<path>)`.
 
+The following Express functions are supported:
+
+1) `get(key)` - identical to Express, except there are no special keys.
+
+2) `set(key,value)` - identical to Express, except there are no special keys.
+
+3) `param(paramName,callback)` - identical to Express.
+
+4) `route(path)` - `path` can also be a function taking the request object as an argument and returning `true` || `false`. Or it can be a RegExp.
+
+5) `use(pathOrCallback,...callbacks)` - identical to Express.
+
+
 # release history (reverse chronological order)
+
+2018-08-22 v0.0.3a enhanced Express like functionality
 
 2018-08-22 v0.0.2a added Express like functionality
 

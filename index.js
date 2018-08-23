@@ -16,9 +16,14 @@
 		});
 	}
 	
-	async function runCallback(cb,request,response) {
+	async function runCallback(cb,request,response,value) {
 		if(typeof(cb)==="string") return true; // it is actually a path
-		return new Promise(resolve => cb(request,response,resolve));
+		return new Promise(resolve => {
+			const result = cb(request,response,resolve,value);
+			if(result && typeof(result)==="object" && result instanceof Promise) {
+				result.then(result => resolve(result))
+			}
+		});
 	}
 	
 	function toJSON(value) {
@@ -55,6 +60,7 @@
 	class FOS {
 		constructor(functions,{allow,name,before,after,done}={}) {
 			this.functions = functions;
+			this.properties = {};
 			const requestHandler = async (request, response) => {
 				request.fos = this;
 				if(allow) {
@@ -113,6 +119,9 @@
 			};
 			this.server = http.createServer(requestHandler);
 		}
+		get(name) {
+			return this.properties[name];
+		}
 		listen(port) {
 			this.server.listen(port, err => {
 				if(err) {
@@ -120,6 +129,19 @@
 				}
 				console.log(`A FOS is listening on ${port}`);
 			})
+		}
+		param(params,callback) {
+			if(!this.params) {
+				this.params = {};
+			}
+			if(Array.isArray(params)) {
+				params.slice().forEach(param => this.params[`:${param}`] = callback);
+			} else {
+				this.params[`:${params}`] = callback;
+			}
+		}
+		set(name,value) {
+			this.properties[name] = value;
 		}
 		route(path) {
 			if(!this.routes) {
@@ -135,8 +157,12 @@
 			});
 			return proxy;
 		}
-		use(...callbacks) {
-			this.route(callbacks[0]).all(async (request,response,next) => {
+		use(pathOrCallback,...callbacks) {
+			if(typeof(pathOrCallback)==="function") {
+				callbacks.unshift(pathOrCallback);
+				pathOrCallback = () => true;
+			}
+			this.route(pathOrCallback).all(async (request,response,next) => {
 					for(const cb of callbacks) {
 						if("route"===await runCallback(cb,request,response)) break;
 					}
@@ -146,20 +172,35 @@
 		}
 		static async request(path) {
 			const {request,response} = this,
-				fos = request.fos;
-			let result;
+				fos = request.fos,
+				uparts = path.split("/"),
+				params = Object.assign({},fos.params);
 			for(const route of fos.routes) {
-				if(typeof(route.path)==="function" || route.path.indexOf(request.url.substring(0,route.path.length)===0)) {
+				const type = typeof(route.path),
+					pparts = type==="string" ? route.path.split("/") : [];
+				let result;
+				for(let i=0;i<pparts.length && i<uparts.length;i++) {
+					const ppart = pparts[i],
+						upart = uparts[i];
+					if(params[ppart]) {
+						result = await runCallback(params[ppart],request,response,uparts[i]);
+						delete params[ppart];
+						if(result==="route") break;
+					} else if(ppart!==upart) {
+						result="route";
+						break;
+					}
+				}
+				if(result==="route" || pparts.length>uparts.length) continue;
+				if((type==="function" && route.path(request)) || (type==="object" && route.path instanceof RegExp && route.path.test(request.url)) || (type==="string" && route.path.indexOf(request.url.substring(0,route.path.length)===0))) {
 					if(route.all) result = await runCallback(route.all,request,response);
 					if(result==="route") continue;
 					const verb = request.method.toLowerCase();
 					if(route[verb]) result = await runCallback(route[verb],request,response);
-					if(result==="route") continue;
 				}
 			}
 		}
 	}
-	
 	
 	module.exports = FOS;
 
