@@ -1,4 +1,4 @@
-# fos v0.0.4a
+# fos v0.0.5a
 
 Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.
 
@@ -143,10 +143,10 @@ F({credentials:true}).echo("a").then(result => alert(result));
 
 ## emulating Express ... plus some extras
 
-To emulate basic Express functionality, just add the static function `FOS.request` to your handler object and then add middleware like you normally would:
+To emulate basic Express functionality, just use the Express API like you normally would:
 
 ```
-const fos = new FOS({request:FOS.request});
+const fos = new FOS({});
 fos.use("/hello",(request,response) => response.end("hi!"));
 fos.listen(3000);
 ```
@@ -169,8 +169,12 @@ The following Express functions are supported on the server:
 The `Request` object used by callbacks on the server goes beyond Express and is enhanced to support all the properties and methods available on the standards compliant URL as documented on 
 [documented on MDN](https://developer.mozilla.org/en-US/docs/Web/API/URL). This inclused aliasing `pathname` to `path` and `searchParams` to `query`.
 
+Note, the current release of FOS does not support the `acceptsXXX` methods, template engine functionality, or `mountpath` and the `use` method can’t take another middleware as an argument.
+
 
 # release history (reverse chronological order)
+
+2018-08-28 v0.0.5a ALPHA Documentation updates
 
 2018-08-28 v0.0.4a ALPHA Improved Express emulation. fos script now loaded from /fos not root. No longer necessary to add FOS.request to handler object; done automatically on the first call to `use` or `route`. Corrected Express emulation for root path, i.e. "/". Added static router.
 
