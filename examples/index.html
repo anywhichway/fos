@@ -1,6 +1,6 @@
 <html>
 <head>
-<script src="http://localhost:3000"></script>
+<script src="http://localhost:3000/fos"></script>
 <script>
 F.echo("a").then(result => console.log(result));
 F.echo("1").then(result => console.log(result));
@@ -8,8 +8,10 @@ F.upper("abc").then(result => console.log(result));
 F.f().then(result => console.log(result));
 
 var funserver;
-fetch("http://localhost:3000/").then(response => response.text()).then(text => Function(text + "; funserver = F")());
+fetch("http://localhost:3000/fos").then(response => response.text()).then(text => Function(text + "; funserver = F")());
 </script>
 </head>
-<body></body>
+<body>
+FOS Example - open debugger to see results
+</body>
 </html>
