@@ -4,7 +4,7 @@
 	if(typeof(module)!=="undefined") {
 		createServer = require("http").createServer;
 		URL = require("url").URL;
-	} else {
+	} else { // not yet supported/tested
 		class ServerResponse {
 			constructor() {
 				this.promise = new Promise(resolve => this.resolve=resolve);
@@ -68,7 +68,7 @@
 	
 	function toJSON(value) {
 		return JSON.stringify(value,(_,value) => {
-		  if(value!==value || value===Infinity || value===-Infinity || value===undefined) return `@{value}`;
+		  if(value!==value || value===Infinity || value===-Infinity || value===undefined) return `${value}`;
 		  if(typeof(value)==="function") return "Function@" + value;
 		  return value;
 		})
@@ -110,12 +110,14 @@
 				request.fos = this;
 				response.locals = Object.assign({},this.locals);
 				const url = new URL(request.url,(request.secure ? "https://" : "http://") + request.headers.host);
-				request.subdomains = [];
-				const parts = request.headers.host.split(".");
-				if(parts.length>2) {
-					parts.pop();
-					parts.pop();
-					request.subdomains.push(parts.join("."));
+				if(!request.subdomains) {
+					request.subdomains = [];
+					const parts = request.headers.host.split(".");
+					if(parts.length>2) {
+						parts.pop();
+						parts.pop();
+						request.subdomains.push(parts.join("."));
+					}
 				}
 				request = new Proxy(request,{
 					get:(target,property) => {
@@ -146,10 +148,13 @@
 				if(!response.headersSent) {
 					let result;
 					if(request.pathname==="/fos") {
+						response.statusCode = 200;
 				  	response.setHeader("Content-Type","text/javascript");
 				  	response.end(`${name ? "const " + name + " = " : ""}${toScript(this.functions,{server:request.protocol  + "//" + request.host})};`);
 				  	return;
-					} else if(request.pathname.indexOf("/fos/")===0){
+					}
+					if(request.pathname.indexOf("/fos/")===0){
+						response.statusCode = 200;
 				  	const parts = request.pathname.substring(5).split(".");
 				  	let node = this.functions,
 				  		key;
@@ -294,7 +299,19 @@
 			return this;
 		}
 		static fosify(app,functions,options) {
-			app.path("/fos").get(new FOS(functions,options));
+			options = Object.assign({},options,{middleware:true});
+			const fos = new FOS(functions,options);
+			if(app.context && app.callback) { // Koa app has these, Express does not
+				app.use(async (ctx,next) => {
+					await next();
+					if(ctx.request.path==="/fos" || /\/fos\/.*/.test(ctx.request.path)) {
+						fos(ctx.request.req,ctx.response.res);
+					}
+				})
+			} else {
+				app.route("/fos").get(fos);
+				app.route(/\/fos\/.*/).get(fos);
+			}
 		}
 		static async request(path) {
 			const {request,response} = this,

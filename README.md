@@ -1,4 +1,4 @@
-# fos v0.0.5a
+# fos v0.0.6a
 
 Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.
 
@@ -10,7 +10,7 @@ FOS instances can also emulate Express.
 
 # usage
 
-## server
+## FOS server
 
 Just create a new server by passing in an object with the functions you wish to expose, allowed client IPs or domains, and a name. Then start start listening:
 
@@ -41,6 +41,30 @@ static(path,{location=".",defaultFile="index.html",mimeTypes={}}={})
 `mimeTypes` are additional mimeTypes to support. To keep FOS small only `html` and `js` are built-in. The
 surface of the object is `{<extension>:<mime-type>[,<extension>:<mime-type>...]}`.
 
+## FOS Enabled Express or Koa App
+
+If you wnat to use your existing Express or Koa apps as Function Orineted Servers, you can do this instead:
+
+```
+const express = require('express'),
+fosify = require("../index.js").fosify,
+	app = express();
+
+fosify(app,{echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*",name:"F"});
+app.use(express.static(__dirname + "/"));
+app.listen(3000, () => console.log("Express FOS listening on 3000"))
+```
+
+```
+const Koa = require('koa'),
+	fosify = require("../index.js").fosify,
+	app = new Koa();
+
+app.use(require('koa-static')(__dirname + "/"));
+fosify(app,{echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*",name:"F"});
+app.listen(3000,() => console.log("Koa FOS server listening on 3000"));
+```
+
 ## browser
 
 Define an HTML file, perhaps `index.html` that loads the exposed functions from the path `/fos` of the FOS. The exposed functions will have the same call signature as those on the server, except they will return Promises that resolve to the normal return values.
@@ -57,6 +81,7 @@ F.echo("a").then(result => alert(result));
 ```
 
 Load the file in your browser from another server, e.g. `http://localhost:8080/index.html`, or even as a file, e.g. `file:///C:/<path>/index.html`, or (if you have enabled your FOS for static files) `http://localhost:3000/index.html`.
+
 
 # advanced usage
 
@@ -96,7 +121,7 @@ new FOS({
 
 You can pass in `before`, `after`, and `done` methods when creating the server in order to add security or specialized processing.
 
-All the methods take a `Request` object as an argument option `request`. The `request.url` property is a `URL` object rather than just a string. They also take a `ServerResponse` object as an argument option `response`.
+All the methods take a `Request` object as an argument option `request`. They also take a `ServerResponse` object as an argument option `response`.
 
 ### before: function({request,response})  { ... }
 
@@ -104,7 +129,7 @@ Called before the server function is invoked. If it sends headers (not just sets
 
 ### after: function({request,response,result})  { ...; return result; }
 
-Called after the server function is invoked. If it sends headers (not just sets), then processing is aborted and the response is ended. It can return the `result` passed in or different/modified value that will be used as the response body.
+Called after the server function is invoked. If it sends headers (not just sets), then processing is aborted and the response is ended. It can return the `result` passed in or a different/modified value that will be used as the response body.
 
 ### done: function({request,response})  { ... }
 
@@ -173,6 +198,8 @@ Note, the current release of FOS does not support the `acceptsXXX` methods, temp
 
 
 # release history (reverse chronological order)
+
+2018-08-29 v0.0.6a ALPHA Added support to `fosify` Express and Koa apps.
 
 2018-08-28 v0.0.5a ALPHA Documentation updates
 

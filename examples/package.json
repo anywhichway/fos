@@ -1,0 +1,18 @@
+{
+  "name": "fos-express example",
+  "version": "v0.0.1",
+  "description": "ExpressJS Function Oriented Server",
+  "engines": {
+    "node": "10.0.0"
+  },
+  "license": "MIT",
+  "scripts": {},
+  "repository": {},
+  "keywords": [],
+  "author": "Simon Y. Blackwell <syblackwell@anywhichway.com> (http://www.github.com/anywhichway)",
+  "bugs": {},
+  "devDependencies": {},
+  "dependencies": {
+    "koa-static": "^5.0.0"
+  }
+}
