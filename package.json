@@ -1,7 +1,7 @@
 {
   "name": "fos",
-  "version": "v0.0.6a",
-  "description": "Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.",
+  "version": "v0.0.7a",
+  "description": "Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.",
   "engines": {
     "node": "10.0.0"
   },

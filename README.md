@@ -1,6 +1,6 @@
-# fos v0.0.6a
+# fos v0.0.7a
 
-Function Oriented Server: The easy way to expose JavaScript functions to clients as micro-services.
+Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.
 
 FOS instances can also emulate Express.
 
@@ -43,7 +43,7 @@ surface of the object is `{<extension>:<mime-type>[,<extension>:<mime-type>...]}
 
 ## FOS Enabled Express or Koa App
 
-If you wnat to use your existing Express or Koa apps as Function Orineted Servers, you can do this instead:
+If you want to use your existing Express or Koa apps as Function Oriented Servers, you can do this instead:
 
 ```
 const express = require('express'),
@@ -62,7 +62,7 @@ const Koa = require('koa'),
 
 app.use(require('koa-static')(__dirname + "/"));
 fosify(app,{echo:arg => arg,upper:arg => arg.toUpperCase()},{allow:"*",name:"F"});
-app.listen(3000,() => console.log("Koa FOS server listening on 3000"));
+app.listen(3000,() => console.log("Koa FOS listening on 3000"));
 ```
 
 ## browser
@@ -75,7 +75,9 @@ Define an HTML file, perhaps `index.html` that loads the exposed functions from 
 <script src="http://localhost:3000/fos"></script>
 </head>
 <body>
+<script>
 F.echo("a").then(result => alert(result));
+</script>
 </body>
 </html>
 ```
@@ -198,6 +200,8 @@ Note, the current release of FOS does not support the `acceptsXXX` methods, temp
 
 
 # release history (reverse chronological order)
+
+2018-09-01 v0.0.7a ALPHA Documentation fixes
 
 2018-08-29 v0.0.6a ALPHA Added support to `fosify` Express and Koa apps.
 
