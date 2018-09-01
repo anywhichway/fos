@@ -8,6 +8,12 @@ FOS instances can also emulate Express.
 
 `npm install fos`
 
+# why
+
+On the funmction orineted side, we wanted to be able to expose an already existing, well-defined, and well-understood API without having to create a whole new set of documentation, build volumes of unit tests, or run the risk of changing the API semantics during the mapping/wrapping process. In short, we wanted to be efficient for ourselves and others.
+
+On the more route based middleware side, we also wanted to a server that designed to run in Service Worker or on a server from day one.
+
 # usage
 
 ## FOS server
@@ -193,8 +199,8 @@ The following Express functions are supported on the server:
 
 6) HTTP verb methods, e.g. `delete`, `get`, etc.
 
-The `Request` object used by callbacks on the server goes beyond Express and is enhanced to support all the properties and methods available on the standards compliant URL as documented on 
-[documented on MDN](https://developer.mozilla.org/en-US/docs/Web/API/URL). This inclused aliasing `pathname` to `path` and `searchParams` to `query`.
+The `Request` object used by callbacks on the server goes beyond Express and is enhanced to support all the properties and methods available on a standards compliant URL as 
+[documented on MDN](https://developer.mozilla.org/en-US/docs/Web/API/URL). This includes aliasing `pathname` to `path` and `searchParams` to `query`.
 
 Note, the current release of FOS does not support the `acceptsXXX` methods, template engine functionality, or `mountpath` and the `use` method can’t take another middleware as an argument.
 
