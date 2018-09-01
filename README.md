@@ -2,7 +2,7 @@
 
 Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.
 
-FOS instances can also emulate Express.
+FOS instances can also emulate Express or be used to augment existing Express or Koa apps.
 
 # installation
 
