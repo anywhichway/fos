@@ -1,4 +1,4 @@
-# fos v0.0.7a
+# fos v0.0.8a
 
 Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.
 
@@ -10,7 +10,7 @@ FOS instances can also emulate Express or be used to augment existing Express or
 
 # why
 
-On the funmction orineted side, we wanted to be able to expose an already existing, well-defined, and well-understood API without having to create a whole new set of documentation, build volumes of unit tests, or run the risk of changing the API semantics during the mapping/wrapping process. In short, we wanted to be efficient for ourselves and others.
+On the function orineted side, we wanted to be able to expose an already existing, well-defined, and well-understood API without having to create a whole new set of documentation, build volumes of unit tests, or run the risk of changing the API semantics during the mapping/wrapping process. In short, we wanted to be efficient for ourselves and others.
 
 On the more route based middleware side, we also wanted to a server that designed to run in Service Worker or on a server from day one.
 
@@ -37,7 +37,7 @@ fos.static("/");
 The full signature for `static` is:
 
 ```javascript
-static(path,{location=".",defaultFile="index.html",mimeTypes={}}={})
+static(path,{location="",defaultFile="index.html",mimeTypes={}}={})
 ```
 
 `location` is relative to the start-up directory of your FOS.
@@ -206,6 +206,8 @@ Note, the current release of FOS does not support the `acceptsXXX` methods, temp
 
 
 # release history (reverse chronological order)
+
+2018-10-27 v0.0.8a ALPHA Static path fixes
 
 2018-09-01 v0.0.7a ALPHA Documentation fixes
 

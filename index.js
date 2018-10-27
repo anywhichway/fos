@@ -250,7 +250,7 @@
 			});
 			return proxy;
 		}
-		static(path,{location=".",defaultFile="index.html",mimeTypes={}}={}) {
+		static(path,{location="",defaultFile="index.html",mimeTypes={}}={}) {
 			mimeTypes = Object.assign({html:"text/html",js:"application/javascript"},mimeTypes);
 			let fs,
 				normalize;
@@ -268,8 +268,8 @@
 				else if(url[url.length-1]==="/") url += defaultFile;
 				const extension = url.split(".").pop();
 				return new Promise(resolve => {
-					location = normalize(__dirname + location + "/" + url);
-					fs.readFile(url, function(err, data){
+					const path = normalize(location + "/" + url);
+					fs.readFile(path, function(err, data){
 		        if(err) {
 		          response.writeHead(404, {'Content-Type': 'text/plain'});
 		          response.write("Not Found");
@@ -331,7 +331,7 @@
 						delete params[ppart];
 						if(result==="route") break;
 					} else if(ppart && ppart!==upart) {
-						result="route";
+						//result="route";
 						break;
 					}
 				}
