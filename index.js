@@ -48,9 +48,12 @@
 		  if(value==='@Infinity') return Infinity;
 		  if(value==='@-Infinity') return -Infinity;
 		  if(value==='@undefined') return undefined;
-		  if(typeof(value)==="string" && value.indexOf("Function@")===0) {
-		  	if(functions) return Function("return " + value.substring(9))();
-		  	return;
+		  if(typeof(value)==="string") {
+		  	if(value.indexOf("Date@")===0) return new Date(parseInt(value.substring(5)))
+		  	if(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/.test(value)) {
+		  		return new Date(value);
+		  	}
+		  	if(functions && value.indexOf("Function@")===0) return Function("return " + value.substring(9))();
 		  }
 		  return value;
 		});
@@ -68,19 +71,26 @@
 	
 	function toJSON(value) {
 		return JSON.stringify(value,(_,value) => {
-		  if(value!==value || value===Infinity || value===-Infinity || value===undefined) return `${value}`;
-		  if(typeof(value)==="function") return "Function@" + value;
+		  if(value!==value || value===Infinity || value===-Infinity || value===undefined || (typeof(value)==="number" && isNaN(value))) return `@${value}`;
+		  const type = typeof(value);
+		  if(type==="function") return "Function@" + value;
+		  if(value && type==="object" && value instanceof Date) return "Date@" + value.getTime();
 		  return value;
-		})
+		});
 	}
 	
 	function toScript(object,{server},parent="") {
 		function fos(options) { fos._options = options; return fos; };
 		const	handlers = "{" + Object.keys(object).reduce((accum,key,index,array) => {
 				const value = object[key],
-					type = typeof(value);
+					type = typeof(value),
+					proto = Object.getPrototypeOf(value);
 				if(type==="function") { // headers available as fos._headers
-					accum += `"${key}":(...args) => {return fetch("${server}/fos/${parent}${key}?arguments="+encodeURIComponent(toJSON(args)),fos._options).then(response => response.text().then(text => { delete fos._options; if(response.ok) { return text; } throw new Error(response.status + " " + text); })).then(text => fromJSON(text,true));}`
+						accum += `"${key}": (...args) => {
+								return fetch("${server}/fos/${parent}${key}?arguments="+encodeURIComponent(toJSON(args)),fos._options)
+									.then(response => response.text().then(text => { delete fos._options; if(response.ok) { return text; } throw new Error(response.status + " " + text); }))
+									.then(text => fromJSON(text,true));
+							}`
 				} else if(value && type==="object") {
 					accum += `"${key}":` + toScript(value,{server},`${parent}${key}.`);
 				}
@@ -106,6 +116,7 @@
 			this.routes = [];
 			this.locals = {};
 			this.engines = {};
+			this.generators = {};
 			const handler = async (request, response, complete=Promise.resolve()) => {
 				request.fos = this;
 				response.locals = Object.assign({},this.locals);
@@ -146,6 +157,7 @@
 					await before({request,response});
 				}
 				if(!response.headersSent) {
+					//console.log(request.pathname,request.query.arguments);
 					let result;
 					if(request.pathname==="/fos") {
 						response.statusCode = 200;
@@ -161,7 +173,9 @@
 				  	while((key = parts.shift()) && (node = node[key])) {
 				  		if(parts.length===0) {
 				  			try {
+				  				//console.log(request.query.arguments,fromJSON(request.query.arguments))
 				  				result = await node.apply({request,response},fromJSON(request.query.arguments));
+				  				//console.log(result,node);
 				  				if(after) {
 				  					result = await after({result,request,response});
 				  				}
@@ -186,7 +200,7 @@
 				  }
 					if(middleware) {
 						complete();
-					} else { 
+					} else {
 						response.statusCode = 404;
 						response.end("Not Found");
 					}
@@ -269,6 +283,7 @@
 				const extension = url.split(".").pop();
 				return new Promise(resolve => {
 					const path = normalize(location + "/" + url);
+					console.log(path);
 					fs.readFile(path, function(err, data){
 		        if(err) {
 		          response.writeHead(404, {'Content-Type': 'text/plain'});

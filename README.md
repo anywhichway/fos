@@ -1,4 +1,4 @@
-# fos v0.0.8a
+# fos v0.0.9a
 
 Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.
 
@@ -206,6 +206,8 @@ Note, the current release of FOS does not support the `acceptsXXX` methods, temp
 
 
 # release history (reverse chronological order)
+
+2018-10-27 v0.0.9a ALPHA More static path fixes
 
 2018-10-27 v0.0.8a ALPHA Static path fixes
 
