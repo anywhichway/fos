@@ -1,6 +1,6 @@
 {
   "name": "fos",
-  "version": "v0.0.9a",
+  "version": "v0.0.10a",
   "description": "Function Oriented Server: The easy way to expose JavaScript APIs to clients as micro-services.",
   "engines": {
     "node": ">=10.0.0"
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/anywhichway/fos#readme",
   "devDependencies": {
-    "cookie-parser": "^1.4.3"
-  },
-  "dependencies": {}
+    "cookie-parser": "^1.4.3",
+    "markdown-it": "^13.0.2"
+  }
 }

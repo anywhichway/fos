@@ -2,13 +2,12 @@
 <head>
 <script src="http://localhost:3000/fos"></script>
 <script>
-F.echo("a").then(result => console.log(result));
-F.echo("1").then(result => console.log(result));
-F.upper("abc").then(result => console.log(result));
-F.f().then(result => console.log(result));
+FOS.echo("a").then(result => console.log(result));
+FOS.echo("1").then(result => console.log(result));
+FOS.upper("abc").then(result => console.log(result));
+FOS.f().then(result => console.log(result));
 
-var funserver;
-fetch("http://localhost:3000/fos").then(response => response.text()).then(text => Function(text + "; funserver = F")());
+
 </script>
 </head>
 <body>

@@ -207,6 +207,8 @@ Note, the current release of FOS does not support the `acceptsXXX` methods, temp
 
 # release history (reverse chronological order)
 
+2023-10-04 v0.0.10a ALPHA Added support for MIME type transformers. Fixed an issue with path resolution.
+
 2018-10-27 v0.0.9a ALPHA More static path fixes
 
 2018-10-27 v0.0.8a ALPHA Static path fixes
